@@ -22,7 +22,7 @@ public class ItemController {
     public static final int MIN_ID_VALUE = 1;
     public static final String USER_ID_HEADER = "X-Sharer-User-Id";
     public static final String NULL_ITEM_ID = "itemID is null";
-    public static final String NULL_USER_ID= "userID is null";
+    public static final String NULL_USER_ID = "userID is null";
 
     private final ItemService itemService;
     private final ItemMapper mapper;
