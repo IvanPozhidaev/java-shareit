@@ -12,29 +12,24 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private UserDao userDao;
-    private UserValidationService validationService;
 
     @Override
     public User createUser(User user) {
-        validationService.validateUser(user);
         return userDao.createUser(user);
     }
 
     @Override
     public User updateUser(long userId, User user) {
-        validationService.validateUserId(userId);
         return userDao.updateUser(userId, user);
     }
 
     @Override
     public User findUserById(long userId) {
-        validationService.validateUserId(userId);
         return userDao.findUserById(userId);
     }
 
     @Override
     public void deleteUserById(long userId) {
-        validationService.validateUserId(userId);
         userDao.deleteUserById(userId);
     }
 

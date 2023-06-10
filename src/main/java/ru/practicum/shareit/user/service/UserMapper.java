@@ -15,7 +15,7 @@ public class UserMapper {
     }
 
     public User toModel(UserDto userDto, Long userId) {
-        return new User(userId, userDto.getName(), userDto.getName());
+        return new User(userId, userDto.getName(), userDto.getEmail());
     }
 
     public List<UserDto> mapUserListToUserDtoList(List<User> users) {
