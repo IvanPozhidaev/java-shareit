@@ -5,12 +5,10 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.exception.OwnerNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.dao.ItemDao;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.dao.UserDao;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -55,8 +53,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private boolean isOwnerExists(long ownerId) {
-        List<User> users = userDao.findAllUsers();
-        List<User> result = users.stream().filter(user -> user.getId() == ownerId).collect(Collectors.toList());
-        return result.size() > 0;
+        return userDao.findUserById(ownerId) != null;
     }
 }
