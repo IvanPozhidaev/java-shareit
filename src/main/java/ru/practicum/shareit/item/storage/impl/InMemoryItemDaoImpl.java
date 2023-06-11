@@ -60,7 +60,7 @@ public class InMemoryItemDaoImpl implements ItemDao {
     public List<Item> findAllItems(Long userId) {
         return userItems.getOrDefault(userId, Collections.emptyList());
     }
-    
+
     @Override
     public List<Item> findItemsByRequest(String text) {
         String wantedItem = text.toLowerCase();
