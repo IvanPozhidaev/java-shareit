@@ -6,10 +6,8 @@ import ru.practicum.shareit.item.exception.ItemNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.dao.ItemDao;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryItemDaoImpl implements ItemDao {
@@ -18,6 +16,7 @@ public class InMemoryItemDaoImpl implements ItemDao {
     public static final String ACCESS_DENIED = "Пользователь не является владельцем вещи";
 
     private final Map<Long, Item> items = new HashMap<>();
+    private Map<Long, List<Item>> userItems = new HashMap<>();
     private long currentId = 1;
 
     @Override
@@ -25,6 +24,8 @@ public class InMemoryItemDaoImpl implements ItemDao {
         long id = generateId();
         item.setId(id);
         items.put(id, item);
+        List<Item> userItemList = userItems.computeIfAbsent(item.getOwner(), k -> new ArrayList<>());
+        userItemList.add(item);
         return item;
     }
 
@@ -57,28 +58,21 @@ public class InMemoryItemDaoImpl implements ItemDao {
 
     @Override
     public List<Item> findAllItems(Long userId) {
-        List<Item> result = new ArrayList<>();
-        for (Item item : items.values()) {
-            if (item.getOwner().equals(userId)) result.add(item);
-        }
-        return result;
+        return userItems.getOrDefault(userId, Collections.emptyList());
     }
-
+    
     @Override
     public List<Item> findItemsByRequest(String text) {
-        List<Item> result = new ArrayList<>();
         String wantedItem = text.toLowerCase();
-
-        for (Item item : items.values()) {
-            String itemName = item.getName().toLowerCase();
-            String itemDescription = item.getDescription().toLowerCase();
-
-            if ((itemName.contains(wantedItem) || itemDescription.contains(wantedItem))
-                    && item.getAvailable().equals(true)) {
-                result.add(item);
-            }
-        }
-        return result;
+        return items.values()
+                .stream()
+                .filter(item -> {
+                    String itemName = item.getName().toLowerCase();
+                    String itemDescription = item.getDescription().toLowerCase();
+                    return itemName.contains(wantedItem) || itemDescription.contains(wantedItem);
+                })
+                .filter(Item::getAvailable)
+                .collect(Collectors.toList());
     }
 
     private long generateId() {
