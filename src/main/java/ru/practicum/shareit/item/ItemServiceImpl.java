@@ -5,6 +5,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.exception.CommentException;
 import ru.practicum.shareit.exception.DeniedAccessException;
 import ru.practicum.shareit.exception.OwnerNotFoundException;
@@ -174,14 +175,22 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private ItemDto constructItemDtoForOwner(Item item, LocalDateTime now, Sort sort, List<Comment> comments) {
-        Booking lastBooking = bookingRepository.findBookingByItemIdAndEndBefore(item.getId(), now, sort)
-                .stream().findFirst().orElse(null);
-        Booking nextBooking = bookingRepository.findBookingByItemIdAndStartAfter(item.getId(), now, sort)
-                .stream().findFirst().orElse(null);
+        List<Booking> lastBooking = bookingRepository.findLastBookingsByItemIdAndEndIsBeforeAndStatusIs(
+                item.getId(), LocalDateTime.now(), BookingStatus.APPROVED, Sort.by(Sort.Direction.DESC, "end"));
 
-        return ItemMapper.toDto(item,
-                lastBooking,
-                nextBooking,
+        List<Booking> nextBooking = bookingRepository.findNextBookingsByItemIdAndEndIsAfterAndStatusIs(
+                item.getId(), LocalDateTime.now(), BookingStatus.APPROVED, Sort.by(Sort.Direction.ASC, "end"));
+
+        ItemDto itemDto = ItemMapper.toDto(item,
+                lastBooking.isEmpty() ? null : lastBooking.get(0),
+                nextBooking.isEmpty() ? null : nextBooking.get(0),
                 comments);
+
+        if (itemDto.getLastBooking() == null && itemDto.getNextBooking() != null) {
+            itemDto.setLastBooking(itemDto.getNextBooking());
+            itemDto.setNextBooking(null);
+        }
+
+        return itemDto;
     }
 }

@@ -1,6 +1,9 @@
 package ru.practicum.shareit.user;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -10,6 +13,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "users")
+@Table(name = "users")
 public class User {
     public static final int MAX_EMAIL_LENGTH = 512;
     public static final String NAME_COLUMN_NAME = "name";
@@ -22,7 +26,7 @@ public class User {
     private Long id;
     @Column(name = NAME_COLUMN_NAME, nullable = false)
     private String name;
-    @Column(name = EMAIL_COLUMN_NAME, nullable = false, length = MAX_EMAIL_LENGTH)
+    @Column(name = EMAIL_COLUMN_NAME, nullable = false, length = MAX_EMAIL_LENGTH, unique = true)
     private String email;
 
     @Override

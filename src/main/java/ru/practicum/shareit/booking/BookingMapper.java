@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking;
 import ru.practicum.shareit.booking.dto.*;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.UserDto;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +25,8 @@ public class BookingMapper {
         dto.setItem(item);
         dto.setStart(booking.getStart());
         dto.setEnd(booking.getEnd());
+        dto.setStatus(booking.getStatus());
+        dto.setBooker(new UserDto(booking.getBooker().getId(), null, null));
         return dto;
     }
 
@@ -31,6 +34,8 @@ public class BookingMapper {
         BookingResponseDto dto = new BookingResponseDto();
         dto.setId(booking.getId());
         dto.setStatus(booking.getStatus());
+        dto.setStart(booking.getStart());
+        dto.setEnd(booking.getEnd());
         dto.setBooker(booker);
         dto.setItem(item);
         dto.setName(item.getName());

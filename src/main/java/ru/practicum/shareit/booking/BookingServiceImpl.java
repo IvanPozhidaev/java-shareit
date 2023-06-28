@@ -21,7 +21,6 @@ import java.util.NoSuchElementException;
 
 import static ru.practicum.shareit.booking.BookingStatus.REJECTED;
 import static ru.practicum.shareit.booking.BookingStatus.WAITING;
-import static ru.practicum.shareit.booking.State.*;
 
 @Service
 @AllArgsConstructor
@@ -104,29 +103,29 @@ public class BookingServiceImpl implements BookingService {
         Sort sort = Sort.by("start").descending();
 
         switch (status) {
-            case REJECTED :
+            case REJECTED:
                 bookings = bookingRepository
                         .findByBookerIdAndStatus(userId, REJECTED, sort);
                 break;
-            case WAITING :
+            case WAITING:
                 bookings = bookingRepository
                         .findByBookerIdAndStatus(userId, WAITING, sort);
                 break;
-            case CURRENT :
+            case CURRENT:
                 bookings = bookingRepository.findByBookerIdCurrent(userId, now);
                 break;
-            case FUTURE :
+            case FUTURE:
                 bookings = bookingRepository
                         .findByBookerIdAndStartIsAfter(userId, now, sort);
                 break;
-            case PAST :
+            case PAST:
                 bookings = bookingRepository
                         .findByBookerIdAndEndIsBefore(userId, now, sort);
                 break;
-            case ALL :
+            case ALL:
                 bookings = bookingRepository.findByBookerId(userId, sort);
                 break;
-            default :
+            default:
                 throw new IllegalArgumentException(ILLEGAL_SATE_MESSAGE);
         }
         return BookingMapper.toListDetailedDto(bookings);
@@ -141,30 +140,30 @@ public class BookingServiceImpl implements BookingService {
         Sort sort = Sort.by("start").descending();
 
         switch (state) {
-            case REJECTED :
+            case REJECTED:
                 bookings = bookingRepository
                         .findBookingByItemOwnerAndStatus(userId, REJECTED, sort);
                 break;
-            case WAITING :
+            case WAITING:
                 bookings = bookingRepository
                         .findBookingByItemOwnerAndStatus(userId, WAITING, sort);
                 break;
-            case CURRENT :
+            case CURRENT:
                 bookings = bookingRepository.findBookingsByItemOwnerCurrent(userId, now);
                 break;
-            case FUTURE :
+            case FUTURE:
                 bookings = bookingRepository
                         .findBookingByItemOwnerAndStartIsAfter(userId, now, sort);
                 break;
-            case PAST :
+            case PAST:
                 bookings = bookingRepository
                         .findBookingByItemOwnerAndEndIsBefore(userId, now, sort);
                 break;
-            case ALL :
+            case ALL:
                 bookings = bookingRepository
                         .findBookingByItemOwner(userId, sort);
                 break;
-            default :
+            default:
                 throw new IllegalArgumentException(ILLEGAL_SATE_MESSAGE);
         }
         return BookingMapper.toListDetailedDto(bookings);
