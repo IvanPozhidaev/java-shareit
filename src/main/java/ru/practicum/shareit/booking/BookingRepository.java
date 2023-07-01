@@ -30,8 +30,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findBookingByItemIdAndStartAfter(Long itemId, LocalDateTime now, Sort sort);
 
     List<Booking> findByBookerIdAndStartLessThanAndEndGreaterThanOrderByStartAsc(Long userId,
-                                                                                 LocalDateTime now,
-                                                                                 LocalDateTime otherNow);
+                                                                                 LocalDateTime start,
+                                                                                 LocalDateTime end);
 
     @Query("select b from bookings b " +
             "where b.item.owner = ?1 " +

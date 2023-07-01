@@ -9,7 +9,6 @@ import ru.practicum.shareit.booking.dto.BookingPostResponseDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.exception.InvalidBookingException;
 import ru.practicum.shareit.exception.UnavailableBookingException;
-import ru.practicum.shareit.exception.UnsupportedStatusException;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.User;
@@ -96,10 +95,10 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDetailedDto> findAllByBooker(String state, Long userId) {
-        State status = parseState(state);
+        State status = State.parseState(state);
         checkIfUserExists(userId);
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime otherNow = LocalDateTime.now();
+        LocalDateTime start = LocalDateTime.now();
+        LocalDateTime end = LocalDateTime.now();
         List<Booking> bookings;
         Sort sort = Sort.by("start").descending();
 
@@ -114,15 +113,15 @@ public class BookingServiceImpl implements BookingService {
                 break;
             case CURRENT:
                 bookings = bookingRepository.findByBookerIdAndStartLessThanAndEndGreaterThanOrderByStartAsc(userId,
-                        now, otherNow);
+                        start, end);
                 break;
             case FUTURE:
                 bookings = bookingRepository
-                        .findByBookerIdAndStartIsAfter(userId, now, sort);
+                        .findByBookerIdAndStartIsAfter(userId, start, sort);
                 break;
             case PAST:
                 bookings = bookingRepository
-                        .findByBookerIdAndEndIsBefore(userId, now, sort);
+                        .findByBookerIdAndEndIsBefore(userId, start, sort);
                 break;
             case ALL:
                 bookings = bookingRepository.findByBookerId(userId, sort);
@@ -135,7 +134,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDetailedDto> findAllByItemOwner(String stateValue, Long userId) {
-        State state = parseState(stateValue);
+        State state = State.parseState(stateValue);
         checkIfUserExists(userId);
         LocalDateTime now = LocalDateTime.now();
         List<Booking> bookings;
@@ -173,16 +172,6 @@ public class BookingServiceImpl implements BookingService {
 
     private void checkIfUserExists(Long userId) {
         userRepository.findById(userId).orElseThrow();
-    }
-
-    private State parseState(String state) {
-        State status;
-        try {
-            status = State.valueOf(state);
-        } catch (IllegalArgumentException e) {
-            throw new UnsupportedStatusException(ILLEGAL_SATE_MESSAGE + state);
-        }
-        return status;
     }
 
     private boolean isStartBeforeEnd(BookingPostDto dto) {
