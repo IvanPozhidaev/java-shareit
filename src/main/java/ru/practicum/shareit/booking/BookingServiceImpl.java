@@ -99,6 +99,7 @@ public class BookingServiceImpl implements BookingService {
         State status = parseState(state);
         checkIfUserExists(userId);
         LocalDateTime now = LocalDateTime.now();
+        LocalDateTime otherNow = LocalDateTime.now();
         List<Booking> bookings;
         Sort sort = Sort.by("start").descending();
 
@@ -112,7 +113,8 @@ public class BookingServiceImpl implements BookingService {
                         .findByBookerIdAndStatus(userId, WAITING, sort);
                 break;
             case CURRENT:
-                bookings = bookingRepository.findByBookerIdCurrent(userId, now);
+                bookings = bookingRepository.findByBookerIdAndStartLessThanAndEndGreaterThanOrderByStartAsc(userId,
+                        now, otherNow);
                 break;
             case FUTURE:
                 bookings = bookingRepository
