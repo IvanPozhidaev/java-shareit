@@ -17,22 +17,15 @@ import java.time.LocalDateTime;
 @Entity(name = "bookings")
 public class Booking {
 
-    public static final String ITEM_COLUMN_NAME = "item";
-    public static final String END_COLUMN_NAME = "end_time";
-    public static final String ID_COLUMN_NAME = "booking_id";
-    public static final String BOOKER_COLUMN_NAME = "booker";
-    public static final String STATUS_COLUMN_NAME = "status";
-    public static final String START_COLUMN_NAME = "start_time";
-
     @Id
-    @Column(name = ID_COLUMN_NAME)
+    @Column(name = "booking_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = START_COLUMN_NAME, nullable = false)
+    @Column(name = "start_time", nullable = false)
     private LocalDateTime start;
 
-    @Column(name = END_COLUMN_NAME, nullable = false)
+    @Column(name = "end_time", nullable = false)
     private LocalDateTime end;
 
     @ManyToOne
@@ -43,7 +36,7 @@ public class Booking {
     @JoinColumn(name = "booker_id")
     private User booker;
 
-    @Column(name = STATUS_COLUMN_NAME, nullable = false)
+    @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
 }
