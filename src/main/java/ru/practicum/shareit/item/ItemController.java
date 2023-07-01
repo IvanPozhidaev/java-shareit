@@ -15,6 +15,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
+@Validated
 @RequestMapping(path = "/items")
 public class ItemController {
     public static final int MIN_ID_VALUE = 1;

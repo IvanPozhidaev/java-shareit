@@ -13,6 +13,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
+@Validated
 @RequestMapping(path = "/bookings")
 public class BookingController {
 

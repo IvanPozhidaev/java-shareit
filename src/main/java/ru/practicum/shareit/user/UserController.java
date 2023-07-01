@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
+@Validated
 @RequestMapping(path = "/users")
 public class UserController {
     public static final int MIN_ID_VALUE = 1;
