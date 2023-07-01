@@ -163,15 +163,18 @@ public class ItemServiceImpl implements ItemService {
         LocalDateTime now = LocalDateTime.now();
         Sort sortDesc = Sort.by("start").descending();
 
-        for (Item item : foundItems) {
-            List<Comment> comments = commentRepository.findByItemId(item.getId());
-            if (item.getOwner().equals(userId)) {
-                ItemDto dto = constructItemDtoForOwner(item, now, sortDesc, comments);
-                targetList.add(dto);
-            } else {
-                targetList.add(ItemMapper.toDto(item, comments));
-            }
-        }
+        List<ItemDto> ownerItems = foundItems.stream()
+                .filter(item -> item.getOwner().equals(userId))
+                .map(item -> constructItemDtoForOwner(item, now, sortDesc, commentRepository.findByItemId(item.getId())))
+                .collect(Collectors.toList());
+
+        List<ItemDto> otherItems = foundItems.stream()
+                .filter(item -> !item.getOwner().equals(userId))
+                .map(item -> ItemMapper.toDto(item, commentRepository.findByItemId(item.getId())))
+                .collect(Collectors.toList());
+
+        targetList.addAll(ownerItems);
+        targetList.addAll(otherItems);
     }
 
     private ItemDto constructItemDtoForOwner(Item item, LocalDateTime now, Sort sort, List<Comment> comments) {
