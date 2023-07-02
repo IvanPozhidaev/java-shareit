@@ -129,7 +129,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private boolean isOwnerExists(long ownerId) {
-        return userRepository.existsById(ownerId);
+        return userRepository.findById(ownerId).isPresent();
     }
 
     private Item refreshItem(Item patch) {
