@@ -129,9 +129,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private boolean isOwnerExists(long ownerId) {
-        List<User> users = userRepository.findAll();
-        List<User> result = users.stream().filter(user -> user.getId() == ownerId).collect(Collectors.toList());
-        return result.size() > 0;
+        return userRepository.existsById(ownerId);
     }
 
     private Item refreshItem(Item patch) {
