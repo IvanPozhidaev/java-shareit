@@ -26,9 +26,9 @@ import static ru.practicum.shareit.booking.BookingStatus.WAITING;
 @AllArgsConstructor
 public class BookingServiceImpl implements BookingService {
 
-    public static final String ILLEGAL_SATE_MESSAGE = "  state: ";
+    public static final String ILLEGAL_STATE_MESSAGE = "  state: ";
     public static final String INVALID_BOOKING = "нельзя забронировать свою же вещь";
-    public static final String SATE_ALREADY_SET_MESSAGE = "статус уже выставлен state: ";
+    public static final String STATE_ALREADY_SET_MESSAGE = "статус уже выставлен state: ";
     public static final String BOOKING_INVALID_MESSAGE = "недопустимые значения времени бронирования: ";
     public static final String UNAVAILABLE_BOOKING_MESSAGE = "в данный момент невозможно забронировать item: ";
     public static final String DENIED_PATCH_ACCESS_MESSAGE = "пользователь не является владельцем вещи userId: ";
@@ -72,7 +72,7 @@ public class BookingServiceImpl implements BookingService {
         BookingStatus status = convertToStatus(approved);
 
         if (booking.getStatus().equals(status)) {
-            throw new IllegalArgumentException(SATE_ALREADY_SET_MESSAGE + status);
+            throw new IllegalArgumentException(STATE_ALREADY_SET_MESSAGE + status);
         }
 
         booking.setStatus(status);
@@ -128,7 +128,7 @@ public class BookingServiceImpl implements BookingService {
                 bookings = bookingRepository.findByBookerId(userId, sort);
                 break;
             default:
-                throw new IllegalArgumentException(ILLEGAL_SATE_MESSAGE);
+                throw new IllegalArgumentException(ILLEGAL_STATE_MESSAGE);
         }
         return BookingMapper.toListDetailedDto(bookings);
     }
@@ -166,7 +166,7 @@ public class BookingServiceImpl implements BookingService {
                         .findBookingByItemOwner(userId, sort);
                 break;
             default:
-                throw new IllegalArgumentException(ILLEGAL_SATE_MESSAGE);
+                throw new IllegalArgumentException(ILLEGAL_STATE_MESSAGE);
         }
         return BookingMapper.toListDetailedDto(bookings);
     }

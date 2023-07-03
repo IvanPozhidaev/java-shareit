@@ -2,7 +2,7 @@ package ru.practicum.shareit.booking;
 
 import ru.practicum.shareit.exception.UnsupportedStatusException;
 
-import static ru.practicum.shareit.booking.BookingServiceImpl.ILLEGAL_SATE_MESSAGE;
+import static ru.practicum.shareit.booking.BookingServiceImpl.ILLEGAL_STATE_MESSAGE;
 
 public enum State {
     ALL,
@@ -17,7 +17,7 @@ public enum State {
         try {
             status = State.valueOf(state);
         } catch (IllegalArgumentException e) {
-            throw new UnsupportedStatusException(ILLEGAL_SATE_MESSAGE + state);
+            throw new UnsupportedStatusException(ILLEGAL_STATE_MESSAGE + state);
         }
         return status;
     }
