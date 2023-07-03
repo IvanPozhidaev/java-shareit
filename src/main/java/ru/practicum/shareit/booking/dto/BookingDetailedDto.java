@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.item.Item;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.UserDto;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -23,7 +23,7 @@ public class BookingDetailedDto {
     @NotNull
     private LocalDateTime end;
     private BookingStatus status;
-    private User booker;
+    private UserDto booker;
     private Item item;
     private String name;
 }

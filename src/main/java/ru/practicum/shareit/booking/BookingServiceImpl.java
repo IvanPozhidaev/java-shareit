@@ -12,6 +12,7 @@ import ru.practicum.shareit.exception.UnavailableBookingException;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
@@ -76,7 +77,7 @@ public class BookingServiceImpl implements BookingService {
 
         booking.setStatus(status);
         booking = bookingRepository.save(booking);
-        return BookingMapper.toResponseDto(booking, booking.getBooker(), item);
+        return BookingMapper.toResponseDto(booking, UserMapper.toDto(booking.getBooker()), item);
     }
 
     @Override
