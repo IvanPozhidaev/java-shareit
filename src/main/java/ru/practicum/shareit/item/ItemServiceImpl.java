@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.BookingStatus;
+import ru.practicum.shareit.booking.dto.BookingInItemDto;
 import ru.practicum.shareit.exception.CommentException;
 import ru.practicum.shareit.exception.DeniedAccessException;
 import ru.practicum.shareit.exception.OwnerNotFoundException;
@@ -21,7 +22,9 @@ import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -89,31 +92,23 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> findAllItems(Long userId) {
-        List<Item> userItems = itemRepository.findAll()
-                .stream().filter(item -> item.getOwner().equals(userId))
+        List<ItemDto> result = itemRepository.findAll()
+                .stream()
+                .filter(item -> item.getOwner().equals(userId))
+                .map(item -> {
+                    List<Comment> comments = commentRepository.findByItemId(item.getId());
+                    LocalDateTime now = LocalDateTime.now();
+                    ItemDto itemDto = constructItemDtoForOwner(item, now, null, comments);
+                    return itemDto;
+                })
                 .collect(Collectors.toList());
 
-        List<ItemDto> result = new ArrayList<>();
-        fillItemDtoList(result, userItems, userId);
-
-        result.sort((o1, o2) -> {
-            if (o1.getNextBooking() == null && o2.getNextBooking() == null) {
-                return 0;
-            }
-            if (o1.getNextBooking() != null && o2.getNextBooking() == null) {
-                return -1;
-            }
-            if (o1.getNextBooking() == null && o2.getNextBooking() != null) {
-                return 1;
-            }
-            if (o1.getNextBooking().getStart().isBefore(o2.getNextBooking().getStart())) {
-                return -1;
-            }
-            if (o1.getNextBooking().getStart().isAfter(o2.getNextBooking().getStart())) {
-                return 1;
-            }
-            return 0;
+        Comparator<ItemDto> comparator = Comparator.comparing((ItemDto itemDto) -> {
+            Optional<BookingInItemDto> nextBooking = Optional.ofNullable(itemDto.getNextBooking());
+            return nextBooking.map(BookingInItemDto::getStart).orElse(LocalDateTime.MAX);
         });
+        result.sort(comparator);
+
         return result;
     }
 
