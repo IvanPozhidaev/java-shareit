@@ -21,6 +21,15 @@ public class ItemMapper {
         return dto;
     }
 
+    public static ItemDto toDto(Item item) {
+        ItemDto dto = new ItemDto();
+        dto.setId(item.getId());
+        dto.setName(item.getName());
+        dto.setDescription(item.getDescription());
+        dto.setAvailable(item.getAvailable());
+        return dto;
+    }
+
     public static ItemDto toDto(Item item,
                                 Booking lastBooking,
                                 Booking nextBooking,
