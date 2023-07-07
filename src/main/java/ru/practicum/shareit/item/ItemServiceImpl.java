@@ -92,9 +92,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> findAllItems(Long userId) {
-        List<ItemDto> result = itemRepository.findAll()
+
+        List<ItemDto> result = itemRepository.findAllByOwner(userId)
                 .stream()
-                .filter(item -> item.getOwner().equals(userId))
                 .map(item -> {
                     List<Comment> comments = commentRepository.findByItemId(item.getId());
                     LocalDateTime now = LocalDateTime.now();
@@ -153,21 +153,33 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private void fillItemDtoList(List<ItemDto> targetList, List<Item> foundItems, Long userId) {
-        LocalDateTime now = LocalDateTime.now();
-        Sort sortDesc = Sort.by("start").descending();
+
+        List<Item> userItems = itemRepository.findAllByOwner(userId);
+        List<Long> itemIds = userItems.stream().map(Item::getId).collect(Collectors.toList());
+        List<Comment> comments = commentRepository.findAllByItemIdIn(itemIds);
+
+        itemIds.addAll(foundItems.stream()
+                .filter(item -> !item.getOwner().equals(userId)).
+                map(Item::getId)
+                .collect(Collectors.toList()));
 
         List<ItemDto> ownerItems = foundItems.stream()
                 .filter(item -> item.getOwner().equals(userId))
-                .map(item -> constructItemDtoForOwner(item, now, sortDesc, commentRepository.findByItemId(item.getId())))
+                .map(item -> ItemMapper.toDto(item, filterCommentsByItemId(comments, item.getId())))
+                .sorted()
                 .collect(Collectors.toList());
 
         List<ItemDto> otherItems = foundItems.stream()
                 .filter(item -> !item.getOwner().equals(userId))
-                .map(item -> ItemMapper.toDto(item, commentRepository.findByItemId(item.getId())))
+                .map(item -> ItemMapper.toDto(item, filterCommentsByItemId(comments, item.getId())))
                 .collect(Collectors.toList());
 
         targetList.addAll(ownerItems);
         targetList.addAll(otherItems);
+    }
+
+    private List<Comment> filterCommentsByItemId(List<Comment> comments, Long itemId) {
+        return comments.stream().filter(c -> c.getItem().getId().equals(itemId)).collect(Collectors.toList());
     }
 
     private ItemDto constructItemDtoForOwner(Item item, LocalDateTime now, Sort sort, List<Comment> comments) {
