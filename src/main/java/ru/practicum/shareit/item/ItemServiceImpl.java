@@ -90,23 +90,28 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> findAllItems(Long userId) {
+        List<Item> items = itemRepository.findAllByOwner(userId);
+        List<Long> itemIds = items.stream().map(Item::getId).collect(Collectors.toList());
+        List<Booking> bookings = bookingRepository.findBookingByItemOwner(userId, null);
+        List<Comment> comments = commentRepository.findAllByItemIdIn(itemIds);
 
-        List<ItemDto> result = itemRepository.findAllByOwner(userId)
-                .stream()
-                .map(item -> {
-                    List<Comment> comments = commentRepository.findByItemId(item.getId());
-                    ItemDto itemDto = constructItemDtoForOwner(item, comments);
-                    return itemDto;
-                })
-                .collect(Collectors.toList());
+        List<ItemDto> itemDtos = items.stream().map(item -> {
+            List<Booking> itemBookings = bookings.stream()
+                    .filter(booking -> booking.getItem().getId().equals(item.getId()))
+                    .collect(Collectors.toList());
+            List<Comment> itemComments = comments.stream()
+                    .filter(comment -> comment.getItem().getId().equals(item.getId()))
+                    .collect(Collectors.toList());
+            return ItemMapper.toDto(item, itemBookings, itemComments);
+        }).collect(Collectors.toList());
 
         Comparator<ItemDto> comparator = Comparator.comparing((ItemDto itemDto) -> {
             Optional<BookingInItemDto> nextBooking = Optional.ofNullable(itemDto.getNextBooking());
             return nextBooking.map(BookingInItemDto::getStart).orElse(LocalDateTime.MAX);
         });
-        result.sort(comparator);
+        itemDtos.sort(comparator);
 
-        return result;
+        return itemDtos;
     }
 
     @Override
