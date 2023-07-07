@@ -83,9 +83,7 @@ public class ItemServiceImpl implements ItemService {
         List<Comment> comments = commentRepository.findByItemId(itemId);
 
         if (item.getOwner().equals(userId)) {
-            LocalDateTime now = LocalDateTime.now();
-            Sort sortDesc = Sort.by("start").descending();
-            return constructItemDtoForOwner(item, now, sortDesc, comments);
+            return constructItemDtoForOwner(item, comments);
         }
         return ItemMapper.toDto(item, null, null, comments);
     }
@@ -97,8 +95,7 @@ public class ItemServiceImpl implements ItemService {
                 .stream()
                 .map(item -> {
                     List<Comment> comments = commentRepository.findByItemId(item.getId());
-                    LocalDateTime now = LocalDateTime.now();
-                    ItemDto itemDto = constructItemDtoForOwner(item, now, null, comments);
+                    ItemDto itemDto = constructItemDtoForOwner(item, comments);
                     return itemDto;
                 })
                 .collect(Collectors.toList());
@@ -182,7 +179,7 @@ public class ItemServiceImpl implements ItemService {
         return comments.stream().filter(c -> c.getItem().getId().equals(itemId)).collect(Collectors.toList());
     }
 
-    private ItemDto constructItemDtoForOwner(Item item, LocalDateTime now, Sort sort, List<Comment> comments) {
+    private ItemDto constructItemDtoForOwner(Item item, List<Comment> comments) {
         List<Booking> lastBooking = bookingRepository.findLastBookingsByItemIdAndEndIsBeforeAndStatusIs(
                 item.getId(), LocalDateTime.now(), BookingStatus.APPROVED, Sort.by(Sort.Direction.DESC, "end"));
 
