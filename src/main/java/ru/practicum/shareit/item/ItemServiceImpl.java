@@ -157,7 +157,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private void fillItemDtoList(List<ItemDto> targetList, List<Item> foundItems, Long userId) {
-        
         List<Long> itemIds = itemRepository.findAllByOwner(userId)
                 .stream()
                 .map(Item::getId)
