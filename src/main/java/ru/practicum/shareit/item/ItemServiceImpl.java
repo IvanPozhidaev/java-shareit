@@ -157,18 +157,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private void fillItemDtoList(List<ItemDto> targetList, List<Item> foundItems, Long userId) {
-
-        List<Item> userItems = itemRepository.findAllByOwner(userId);
-        List<Long> itemIds = userItems.stream()
+        
+        List<Long> itemIds = itemRepository.findAllByOwner(userId)
+                .stream()
                 .map(Item::getId)
                 .collect(Collectors.toList());
 
         List<Comment> comments = commentRepository.findAllByItemIdIn(itemIds);
-
-        itemIds.addAll(foundItems.stream()
-                .filter(item -> !item.getOwner().equals(userId))
-                .map(Item::getId)
-                .collect(Collectors.toList()));
 
         List<ItemDto> ownerItems = foundItems.stream()
                 .filter(item -> item.getOwner().equals(userId))
