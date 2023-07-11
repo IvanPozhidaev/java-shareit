@@ -35,13 +35,6 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class ItemServiceImpl implements ItemService {
 
-    public static final int MIN_SEARCH_REQUEST_LENGTH = 3;
-    public static final String OWNER_NOT_FOUND_MESSAGE = "Не найден владелец c id: ";
-    public static final String EMPTY_COMMENT_MESSAGE = "Комментарий не может быть пустым";
-    public static final String DENIED_ACCESS_MESSAGE = "Пользователь не является владельцем вещи";
-    public static final String COMMENT_EXCEPTION_MESSAGE = "Нельзя оставить комментарий на вещь, " +
-            "который вы не пользовались или ещё не закончился срок аренды";
-
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
@@ -53,7 +46,7 @@ public class ItemServiceImpl implements ItemService {
         Item item = ItemMapper.toModel(itemDto, userId);
         boolean ownerExists = isOwnerExists(item.getOwner());
         if (!ownerExists) {
-            throw new OwnerNotFoundException(OWNER_NOT_FOUND_MESSAGE + item.getOwner());
+            throw new OwnerNotFoundException("Не найден владелец c id: " + item.getOwner());
         }
         item = itemRepository.save(item);
         return ItemMapper.toDto(item, null);
@@ -62,12 +55,13 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public DetailedCommentDto createComment(CreateCommentDto dto, Long itemId, Long userId) {
-        if (dto.getText().isBlank()) throw new CommentException(EMPTY_COMMENT_MESSAGE);
+        if (dto.getText().isBlank()) throw new CommentException("Комментарий не может быть пустым");
         Item item = itemRepository.findById(itemId).orElseThrow();
         User author = userRepository.findById(userId).orElseThrow();
 
         if (bookingRepository.findBookingsForAddComments(itemId, userId, LocalDateTime.now()).isEmpty()) {
-            throw new CommentException(COMMENT_EXCEPTION_MESSAGE + " itemId: " + itemId);
+            throw new CommentException("Нельзя оставить комментарий на вещь, " +
+                    "который вы не пользовались или ещё не закончился срок аренды" + " itemId: " + itemId);
         }
         Comment comment = CommentMapper.toModel(dto, item, author);
         comment = commentRepository.save(comment);
@@ -117,7 +111,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> findItemsByRequest(String text, Long userId, int from, int size) {
-        if (text == null || text.isBlank() || text.length() <= MIN_SEARCH_REQUEST_LENGTH) {
+        if (text == null || text.isBlank() || text.length() <= 3) {
             return Collections.emptyList();
         }
         List<ItemDto> result = new ArrayList<>();
@@ -135,7 +129,7 @@ public class ItemServiceImpl implements ItemService {
         Item entry = itemRepository.findById(patch.getId()).orElseThrow();
 
         if (!entry.getOwner().equals(patch.getOwner())) {
-            throw new DeniedAccessException(DENIED_ACCESS_MESSAGE +
+            throw new DeniedAccessException("Пользователь не является владельцем вещи" +
                     "userId: " + patch.getOwner() + ", itemId: " + patch.getId());
         }
 
