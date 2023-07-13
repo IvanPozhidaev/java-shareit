@@ -36,7 +36,7 @@ public class ItemRequestControllerTest {
     public static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     @MockBean
-    ItemRequestService itemRequestService;
+    private ItemRequestService itemRequestService;
 
     private final ObjectMapper mapper = new ObjectMapper();
 

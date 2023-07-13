@@ -36,7 +36,7 @@ public class ItemControllerTest {
     public static final LocalDateTime CREATION_DATE = LocalDateTime.now();
 
     @MockBean
-    ItemService itemService;
+    private ItemService itemService;
 
     private final ObjectMapper mapper = new ObjectMapper();
 

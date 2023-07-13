@@ -44,13 +44,13 @@ public class BookingControllerTest {
     public static final LocalDateTime END_DATE = START_DATE.plusDays(7);
 
     @MockBean
-    BookingService bookingService;
+    private BookingService bookingService;
 
     @Autowired
-    ObjectMapper mapper;
+    private ObjectMapper mapper;
 
     @Autowired
-    MockMvc mvc;
+    private MockMvc mvc;
 
     @Test
     public void createBookingTest() throws Exception {
