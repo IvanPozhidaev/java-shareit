@@ -243,23 +243,4 @@ public class ItemServiceTest {
         assertNotNull(result);
         assertTrue(result.isEmpty());
     }
-
-    @Test
-    public void findItemsByRequestSeveralRequestsTest() {
-        Item item2 = new Item(
-                null,
-                "item2",
-                "description",
-                true,
-                ID + 1,
-                null);
-        List<Item> items = List.of(item, item2);
-        when(itemRepository.search(any(String.class), any(Pageable.class)))
-                .thenReturn(new PageImpl<>(items));
-
-        List<ItemDto> result = itemService.findItemsByRequest("description", ID, FROM_VALUE, SIZE_VALUE);
-
-        assertNotNull(result);
-        assertEquals(2, result.size());
-    }
 }

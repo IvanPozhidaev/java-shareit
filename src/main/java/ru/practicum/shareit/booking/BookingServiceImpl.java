@@ -113,7 +113,8 @@ public class BookingServiceImpl implements BookingService {
         switch (status) {
             case REJECTED:
                 bookings = bookingRepository
-                        .findByBookerIdAndStatus(userId, REJECTED, pageable).toList();;
+                        .findByBookerIdAndStatus(userId, REJECTED, pageable).toList();
+                ;
                 break;
             case WAITING:
                 bookings = bookingRepository
@@ -145,38 +146,37 @@ public class BookingServiceImpl implements BookingService {
         State state = State.parseState(stateValue);
         checkIfUserExists(userId);
         LocalDateTime now = LocalDateTime.now();
-        List<Booking> bookings = new ArrayList<>();
 
         Pageable pageable = PageRequest.of(from / size, size, Sort.by("start").descending());
 
         switch (state) {
             case REJECTED:
-                bookings = bookingRepository
-                        .findBookingByItemOwnerAndStatus(userId, REJECTED, pageable).toList();
-                break;
+                return BookingMapper.toListDetailedDto(bookingRepository
+                        .findBookingByItemOwnerAndStatus(userId, REJECTED, pageable)
+                        .toList());
             case WAITING:
-                bookings = bookingRepository
-                        .findBookingByItemOwnerAndStatus(userId, WAITING, pageable).toList();
-                break;
+                return BookingMapper.toListDetailedDto(bookingRepository
+                        .findBookingByItemOwnerAndStatus(userId, WAITING, pageable)
+                        .toList());
             case CURRENT:
-                bookings = bookingRepository.findBookingsByItemOwnerCurrent(userId, now, pageable).toList();
-                break;
+                return BookingMapper.toListDetailedDto(bookingRepository
+                        .findBookingsByItemOwnerCurrent(userId, now, pageable)
+                        .toList());
             case FUTURE:
-                bookings = bookingRepository
-                        .findBookingByItemOwnerAndStartIsAfter(userId, now, pageable).toList();
-                break;
+                return BookingMapper.toListDetailedDto(bookingRepository
+                        .findBookingByItemOwnerAndStartIsAfter(userId, now, pageable)
+                        .toList());
             case PAST:
-                bookings = bookingRepository
-                        .findBookingByItemOwnerAndEndIsBefore(userId, now, pageable).toList();
-                break;
+                return BookingMapper.toListDetailedDto(bookingRepository
+                        .findBookingByItemOwnerAndEndIsBefore(userId, now, pageable)
+                        .toList());
             case ALL:
-                bookings = bookingRepository
-                        .findBookingByItemOwner(userId, pageable).toList();
-                break;
+                return BookingMapper.toListDetailedDto(bookingRepository
+                        .findBookingByItemOwner(userId, pageable)
+                        .toList());
             default:
                 throw new IllegalArgumentException(ILLEGAL_STATE_MESSAGE);
         }
-        return BookingMapper.toListDetailedDto(bookings);
     }
 
     private void checkIfUserExists(Long userId) {

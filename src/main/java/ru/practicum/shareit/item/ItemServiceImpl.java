@@ -24,10 +24,10 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -84,9 +84,9 @@ public class ItemServiceImpl implements ItemService {
         List<Comment> comments = commentRepository.findByItemId(itemId);
 
         if (item.getOwner().equals(userId)) {
-            return constructItemDtoForOwner(item, comments);
+            return getItemsWithBookingsAndComments(List.of(item), List.of(item.getId())).get(0);
         }
-        return ItemMapper.toDto(item, null, null, comments);
+        return ItemMapper.toDto(item, null, null, comments == null ? List.of() : comments);
     }
 
     @Override
@@ -95,18 +95,13 @@ public class ItemServiceImpl implements ItemService {
         Page<Item> itemPage = itemRepository.findAll(userId, pageable);
         List<Item> userItems = itemPage.getContent();
 
-        List<ItemDto> result = new ArrayList<>();
-        fillItemDtoList(result, userItems, userId);
+        List<Long> itemIds = itemRepository.findAllByOwner(userId)
+                .stream()
+                .map(Item::getId)
+                .collect(Collectors.toList());
 
-        Comparator<ItemDto> itemDtoComparator = Comparator.comparing((ItemDto o) -> {
-            if (o.getNextBooking() == null) {
-                return LocalDateTime.MAX;
-            }
-            return o.getNextBooking().getStart();
-        });
-        result.sort(itemDtoComparator);
+        return getItemsWithBookingsAndComments(userItems, itemIds);
 
-        return result;
     }
 
     @Override
@@ -114,11 +109,47 @@ public class ItemServiceImpl implements ItemService {
         if (text == null || text.isBlank() || text.length() <= 3) {
             return Collections.emptyList();
         }
-        List<ItemDto> result = new ArrayList<>();
         Pageable pageable = PageRequest.of(from / size, size);
         List<Item> foundItems = itemRepository.search(text, pageable).toList();
-        fillItemDtoList(result, foundItems, userId);
-        return result;
+        List<Long> itemIds = foundItems.stream().map(Item::getId).collect(Collectors.toList());
+
+        return getItemsWithBookingsAndComments(foundItems, itemIds);
+    }
+
+    private List<ItemDto> getItemsWithBookingsAndComments(List<Item> foundItems, List<Long> itemIds) {
+        Map<Long, List<Comment>> comments = commentRepository.findAllByItemIdIn(itemIds)
+                .stream()
+                .collect(Collectors.groupingBy(b -> b.getItem().getId()));
+        List<Booking> all = bookingRepository.findAll();
+        System.out.println(LocalDateTime.now());
+        Map<Long, List<Booking>> lastByItemIds = bookingRepository.findLastByItemIds(itemIds,
+                        LocalDateTime.now(),
+                        BookingStatus.APPROVED.name())
+                .stream()
+                .sorted((o1, o2) -> o2.getEnd().compareTo(o1.getEnd()))
+                .collect(Collectors.groupingBy(b -> b.getItem().getId()));
+
+        Map<Long, List<Booking>> nextByItemIds = bookingRepository.findNextByItemIds(itemIds,
+                        LocalDateTime.now(),
+                        BookingStatus.APPROVED.name())
+                .stream()
+                .sorted((o1, o2) -> o1.getStart().compareTo(o2.getStart()))
+                .collect(Collectors.groupingBy(b -> b.getItem().getId()));
+
+        return foundItems.stream()
+                .map(item -> {
+                            List<Booking> lastBookings = lastByItemIds.get(item.getId());
+                            List<Booking> nextBookings = nextByItemIds.get(item.getId());
+                            List<Comment> commentsItem = comments.get(item.getId());
+
+                            return ItemMapper.toDto(item,
+                                    lastBookings == null ? null : lastBookings.get(0),
+                                    nextBookings == null ? null : nextBookings.get(0),
+                                    commentsItem == null ? List.of() : commentsItem);
+                        }
+                )
+                .sorted(Comparator.comparing(ItemDto::getId))
+                .collect(Collectors.toList());
     }
 
     private boolean isOwnerExists(long ownerId) {
@@ -150,50 +181,50 @@ public class ItemServiceImpl implements ItemService {
         return entry;
     }
 
-    private void fillItemDtoList(List<ItemDto> targetList, List<Item> foundItems, Long userId) {
-        List<Long> itemIds = itemRepository.findAllByOwner(userId)
-                .stream()
-                .map(Item::getId)
-                .collect(Collectors.toList());
+//    private void fillItemDtoList(List<ItemDto> targetList, List<Item> foundItems, Long userId) {
+//        List<Long> itemIds = itemRepository.findAllByOwner(userId)
+//                .stream()
+//                .map(Item::getId)
+//                .collect(Collectors.toList());
+//
+//        List<Comment> comments = commentRepository.findAllByItemIdIn(itemIds);
+//
+//        List<ItemDto> ownerItems = foundItems.stream()
+//                .filter(item -> item.getOwner().equals(userId))
+//                .map(item -> constructItemDtoForOwner(item, filterCommentsByItemId(comments, item.getId())))
+//                .sorted(Comparator.comparing(ItemDto::getId))
+//                .collect(Collectors.toList());
+//
+//        List<ItemDto> otherItems = foundItems.stream()
+//                .filter(item -> !item.getOwner().equals(userId))
+//                .map(item -> constructItemDtoForOwner(item, filterCommentsByItemId(comments, item.getId())))
+//                .collect(Collectors.toList());
+//
+//        targetList.addAll(ownerItems);
+//        targetList.addAll(otherItems);
+//    }
 
-        List<Comment> comments = commentRepository.findAllByItemIdIn(itemIds);
+//    private List<Comment> filterCommentsByItemId(List<Comment> comments, Long itemId) {
+//        return comments.stream().filter(c -> c.getItem().getId().equals(itemId)).collect(Collectors.toList());
+//    }
 
-        List<ItemDto> ownerItems = foundItems.stream()
-                .filter(item -> item.getOwner().equals(userId))
-                .map(item -> constructItemDtoForOwner(item, filterCommentsByItemId(comments, item.getId())))
-                .sorted(Comparator.comparing(ItemDto::getId))
-                .collect(Collectors.toList());
-
-        List<ItemDto> otherItems = foundItems.stream()
-                .filter(item -> !item.getOwner().equals(userId))
-                .map(item -> constructItemDtoForOwner(item, filterCommentsByItemId(comments, item.getId())))
-                .collect(Collectors.toList());
-
-        targetList.addAll(ownerItems);
-        targetList.addAll(otherItems);
-    }
-
-    private List<Comment> filterCommentsByItemId(List<Comment> comments, Long itemId) {
-        return comments.stream().filter(c -> c.getItem().getId().equals(itemId)).collect(Collectors.toList());
-    }
-
-    private ItemDto constructItemDtoForOwner(Item item, List<Comment> comments) {
-        List<Booking> lastBooking = bookingRepository.findLastBookingsByItemIdAndEndIsBeforeAndStatusIs(
-                item.getId(), LocalDateTime.now(), BookingStatus.APPROVED, Sort.by(Sort.Direction.DESC, "end"));
-
-        List<Booking> nextBooking = bookingRepository.findNextBookingsByItemIdAndEndIsAfterAndStatusIs(
-                item.getId(), LocalDateTime.now(), BookingStatus.APPROVED, Sort.by(Sort.Direction.ASC, "end"));
-
-        ItemDto itemDto = ItemMapper.toDto(item,
-                lastBooking.isEmpty() ? null : lastBooking.get(0),
-                nextBooking.isEmpty() ? null : nextBooking.get(0),
-                comments);
-
-        if (itemDto.getLastBooking() == null && itemDto.getNextBooking() != null) {
-            itemDto.setLastBooking(itemDto.getNextBooking());
-            itemDto.setNextBooking(null);
-        }
-
-        return itemDto;
-    }
+//    private ItemDto constructItemDtoForOwner(Item item, List<Comment> comments) {
+//        List<Booking> lastBooking = bookingRepository.findLastBookingsByItemIdAndEndIsBeforeAndStatusIs(
+//                item.getId(), LocalDateTime.now(), BookingStatus.APPROVED, Sort.by(Sort.Direction.DESC, "end"));
+//
+//        List<Booking> nextBooking = bookingRepository.findNextBookingsByItemIdAndEndIsAfterAndStatusIs(
+//                item.getId(), LocalDateTime.now(), BookingStatus.APPROVED, Sort.by(Sort.Direction.ASC, "end"));
+//
+//        ItemDto itemDto = ItemMapper.toDto(item,
+//                lastBooking.isEmpty() ? null : lastBooking.get(0),
+//                nextBooking.isEmpty() ? null : nextBooking.get(0),
+//                comments);
+//
+//        if (itemDto.getLastBooking() == null && itemDto.getNextBooking() != null) {
+//            itemDto.setLastBooking(itemDto.getNextBooking());
+//            itemDto.setNextBooking(null);
+//        }
+//
+//        return itemDto;
+//    }
 }

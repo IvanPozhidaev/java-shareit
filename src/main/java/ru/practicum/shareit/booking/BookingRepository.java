@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -54,4 +55,28 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findNextBookingsByItemIdAndEndIsAfterAndStatusIs(
             Long itemId, LocalDateTime end, BookingStatus status, Sort sort);
+
+    @Query(nativeQuery = true, value = "SELECT b.booking_id, b.start_time, b.end_time, b.item_id, b.booker_id, b.status " +
+            "FROM bookings b " +
+            "WHERE b.item_id IN (:itemIds)  " +
+            "  AND b.end_time < :date OR (b.start_time < :date AND b.end_time > :date) " +
+            "  AND b.status = :status " +
+            "GROUP BY b.booking_id, b.start_time, b.end_time, b.item_id, b.booker_id, b.status " +
+            "HAVING b.end_time = MIN(b.end_time) " +
+            "ORDER BY b.end_time")
+    List<Booking> findLastByItemIds(@Param("itemIds") List<Long> itemIds,
+                                    @Param("date") LocalDateTime date,
+                                    @Param("status") String status);
+
+    @Query(nativeQuery = true, value = "SELECT b.booking_id, b.start_time, b.end_time, b.item_id, b.booker_id, b.status " +
+            "FROM bookings b " +
+            "WHERE b.item_id IN (:itemIds)  " +
+            "  AND b.start_time > :date " +
+            "  AND b.status = :status " +
+            "GROUP BY b.booking_id, b.start_time, b.end_time, b.item_id, b.booker_id, b.status " +
+            "HAVING b.end_time = MIN(b.end_time) " +
+            "ORDER BY b.end_time")
+    List<Booking> findNextByItemIds(@Param("itemIds") List<Long> itemIds,
+                                    @Param("date") LocalDateTime date,
+                                    @Param("status") String status);
 }
