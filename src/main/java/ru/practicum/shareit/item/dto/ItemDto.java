@@ -1,9 +1,6 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import ru.practicum.shareit.booking.dto.BookingInItemDto;
 import ru.practicum.shareit.validationmarkers.Create;
 
@@ -13,6 +10,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemDto {
@@ -30,4 +28,5 @@ public class ItemDto {
     private BookingInItemDto lastBooking;
     private BookingInItemDto nextBooking;
     private List<DetailedCommentDto> comments;
+    private Long requestId;
 }
