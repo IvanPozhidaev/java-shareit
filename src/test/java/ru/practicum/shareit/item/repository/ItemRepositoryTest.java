@@ -41,13 +41,13 @@ public class ItemRepositoryTest {
                 "item",
                 "description",
                 true,
-                itemOwner.getId(),
+                itemOwner,
                 null));
 
         request = requestRepository.save(new Request(
                 null,
                 "description",
-                user.getId(),
+                user,
                 LocalDateTime.now()
         ));
     }

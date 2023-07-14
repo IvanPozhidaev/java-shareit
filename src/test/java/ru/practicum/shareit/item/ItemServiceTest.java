@@ -15,6 +15,7 @@ import ru.practicum.shareit.item.dto.DetailedCommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.Request;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -62,13 +63,16 @@ public class ItemServiceTest {
                 bookingRepository,
                 commentRepository);
 
-        item = new Item(
-                ID,
-                "name",
-                "description",
-                true,
-                ID,
-                ID + 1);
+        user = new User(ID, "name", "user@emali.com");
+        item = Item.builder()
+                .id(ID)
+                .name("name")
+                .description("description")
+                .available(true)
+                .owner(user)
+                .request(Request.builder().id(ID + 1).build())
+                .build();
+
         itemDto = new ItemDto(
                 ID,
                 "name",
@@ -79,7 +83,6 @@ public class ItemServiceTest {
                 null,
                 ID + 1);
 
-        user = new User(ID, "name", "user@emali.com");
         comment = new Comment(ID, "comment", item, user, CREATED_DATE);
         createCommentDto = new CreateCommentDto("comment");
         booking = new Booking(ID,
@@ -167,6 +170,9 @@ public class ItemServiceTest {
         itemDto.setName("updatedName");
         item.setName("updatedName");
 
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(user));
+
         when(commentRepository.findByItemId(any(Long.class)))
                 .thenReturn(new ArrayList<>());
 
@@ -185,14 +191,16 @@ public class ItemServiceTest {
 
     @Test
     public void updateItemDeniedExcessTest() {
-        item.setOwner(ID + 1);
+        item.setOwner(User.builder().id(ID + 1).build());
+
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(user));
 
         when(commentRepository.findByItemId(any(Long.class)))
                 .thenReturn(new ArrayList<>());
 
         when(itemRepository.findById(any(Long.class)))
                 .thenReturn(Optional.ofNullable(item));
-
 
         DeniedAccessException exception = assertThrows(DeniedAccessException.class, () -> {
             itemService.updateItem(itemDto, itemDto.getId(), user.getId());

@@ -6,6 +6,7 @@ import ru.practicum.shareit.item.Comment;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.dto.CreateCommentDto;
 import ru.practicum.shareit.item.dto.DetailedCommentDto;
+import ru.practicum.shareit.request.Request;
 import ru.practicum.shareit.user.User;
 
 import java.time.LocalDateTime;
@@ -27,13 +28,14 @@ public class CommentMapperTest {
 
     @BeforeEach
     public void beforeEach() {
-        item = new Item(
-                ID,
-                "name",
-                "description",
-                true,
-                ID,
-                ID + 1);
+        item = Item.builder()
+                .id(ID)
+                .name("name")
+                .description("description")
+                .available(true)
+                .request(Request.builder().id(ID + 1).build())
+                .owner(User.builder().id(ID).build())
+                .build();
         user = new User(ID, "name", "user@emali.com");
         comment = new Comment(ID, "comment", item, user, CREATED_DATE);
         createCommentDto = new CreateCommentDto("comment");

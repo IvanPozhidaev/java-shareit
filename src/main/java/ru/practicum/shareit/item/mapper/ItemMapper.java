@@ -9,6 +9,8 @@ import ru.practicum.shareit.item.Comment;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemInRequestDto;
+import ru.practicum.shareit.request.Request;
+import ru.practicum.shareit.user.User;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -26,7 +28,7 @@ public class ItemMapper {
         if (comments != null) {
             dto.setComments(CommentMapper.toCommentDetailedDtoList(comments));
         }
-        dto.setRequestId(item.getRequestId());
+        dto.setRequestId(item.getRequest() == null ? null : item.getRequest().getId());
         return dto;
     }
 
@@ -83,13 +85,13 @@ public class ItemMapper {
         return dto;
     }
 
-    public static Item toModel(ItemDto itemDto, Long ownerId) {
+    public static Item toModel(ItemDto itemDto, User user) {
         Item item = new Item();
         item.setName(itemDto.getName());
         item.setDescription(itemDto.getDescription());
         item.setAvailable(itemDto.getAvailable());
-        item.setOwner(ownerId);
-        item.setRequestId(itemDto.getRequestId());
+        item.setOwner(user);
+        item.setRequest(itemDto.getRequestId() == null ? null : Request.builder().id(itemDto.getRequestId()).build());
         return item;
     }
 
@@ -99,8 +101,8 @@ public class ItemMapper {
         dto.setName(item.getName());
         dto.setDescription(item.getDescription());
         dto.setAvailable(item.getAvailable());
-        dto.setRequestId(item.getRequestId());
-        dto.setOwner(item.getOwner());
+        dto.setRequestId(item.getRequest().getId());
+        dto.setOwner(item.getOwner().getId());
         return dto;
     }
 

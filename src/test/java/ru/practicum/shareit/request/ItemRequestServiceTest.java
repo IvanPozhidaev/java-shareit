@@ -47,8 +47,8 @@ public class ItemRequestServiceTest {
                 itemRepository,
                 requestRepository);
 
-        request = new Request(ID, "description", ID, CREATED_DATE);
         user = new User(ID, "name", "user@emali.com");
+        request = new Request(ID, "description", user, CREATED_DATE);
     }
 
     @Test
@@ -74,7 +74,7 @@ public class ItemRequestServiceTest {
                 .thenReturn(Optional.ofNullable(user));
 
         when(requestRepository
-                .findRequestByRequestorOrderByCreatedDesc(any(Long.class)))
+                .findRequestByRequestorIdOrderByCreatedDesc(any(Long.class)))
                 .thenReturn(new ArrayList<>());
 
         when(itemRepository.findAllByRequestId(any(Long.class)))

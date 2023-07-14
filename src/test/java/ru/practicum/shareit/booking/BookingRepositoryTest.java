@@ -51,7 +51,7 @@ public class BookingRepositoryTest {
                         "item 1",
                         "description",
                         true,
-                        itemOwner.getId(),
+                        User.builder().id(itemOwner.getId()).build(),
                         null));
         booking = bookingRepository
                 .save(new Booking(null, start, end, item, booker, bookingStatus));
@@ -99,7 +99,7 @@ public class BookingRepositoryTest {
     @Test
     public void findBookingByItemOwnerAndStatusTest() {
         Page<Booking> result = bookingRepository
-                .findBookingByItemOwnerAndStatus(itemOwner.getId(), bookingStatus, Pageable.unpaged());
+                .findBookingByItemOwnerIdAndStatus(itemOwner.getId(), bookingStatus, Pageable.unpaged());
 
         assertNotNull(result);
         assertFalse(result.isEmpty());
@@ -109,7 +109,7 @@ public class BookingRepositoryTest {
     @Test
     public void findBookingByItemOwnerAndEndIsBeforeTest() {
         Page<Booking> result = bookingRepository
-                .findBookingByItemOwnerAndEndIsBefore(
+                .findBookingByItemOwnerIdAndEndIsBefore(
                         itemOwner.getId(), LocalDateTime.now().plusDays(30), Pageable.unpaged());
 
         assertNotNull(result);
@@ -120,7 +120,7 @@ public class BookingRepositoryTest {
     @Test
     public void findBookingByItemOwnerAndStartIsAfterTest() {
         Page<Booking> result = bookingRepository
-                .findBookingByItemOwnerAndStartIsAfter(itemOwner.getId(), LocalDateTime.now(), Pageable.unpaged());
+                .findBookingByItemOwnerIdAndStartIsAfter(itemOwner.getId(), LocalDateTime.now(), Pageable.unpaged());
 
         assertNotNull(result);
         assertFalse(result.isEmpty());
@@ -130,7 +130,7 @@ public class BookingRepositoryTest {
     @Test
     public void findBookingByItemOwnerTest() {
         Page<Booking> result = bookingRepository
-                .findBookingByItemOwner(itemOwner.getId(), Pageable.unpaged());
+                .findBookingByItemOwnerId(itemOwner.getId(), Pageable.unpaged());
 
         assertNotNull(result);
         assertFalse(result.isEmpty());
@@ -173,7 +173,7 @@ public class BookingRepositoryTest {
     @Test
     void findBookingsByItemOwnerCurrentTest() {
         Page<Booking> result = bookingRepository
-                .findBookingsByItemOwnerCurrent(itemOwner.getId(), end.minusDays(5), Pageable.unpaged());
+                .findBookingsByItemOwnerIdCurrent(itemOwner.getId(), end.minusDays(5), Pageable.unpaged());
 
         assertNotNull(result);
         assertFalse(result.isEmpty());

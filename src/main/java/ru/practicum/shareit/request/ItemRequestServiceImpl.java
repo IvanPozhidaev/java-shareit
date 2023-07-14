@@ -31,7 +31,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Transactional
     public PostResponseRequestDto createRequest(PostRequestDto dto, Long userId) {
         checkIfUserExists(userId);
-        Request request  = RequestMapper.toModel(dto, userId);
+        Request request = RequestMapper.toModel(dto, userId);
         request = requestRepository.save(request);
         return RequestMapper.toPostResponseDto(request);
     }
@@ -39,7 +39,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public List<RequestWithItemsDto> findAllByUserId(Long userId) {
         checkIfUserExists(userId);
-        List<Request> requests = requestRepository.findRequestByRequestorOrderByCreatedDesc(userId);
+        List<Request> requests = requestRepository.findRequestByRequestorIdOrderByCreatedDesc(userId);
         return RequestMapper.toRequestWithItemsDtoList(requests, itemRepository);
     }
 

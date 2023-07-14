@@ -42,11 +42,9 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public ItemDto createItem(ItemDto itemDto, Long userId) {
-        Item item = ItemMapper.toModel(itemDto, userId);
-        boolean ownerExists = isOwnerExists(item.getOwner());
-        if (!ownerExists) {
-            throw new OwnerNotFoundException("Не найден владелец c id: " + item.getOwner());
-        }
+        User user = findUserById(userId);
+        Item item = ItemMapper.toModel(itemDto, user);
+
         item = itemRepository.save(item);
         return ItemMapper.toDto(item, null);
     }
@@ -70,7 +68,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public ItemDto updateItem(ItemDto itemDto, Long itemId, Long userId) {
-        Item item = ItemMapper.toModel(itemDto, userId);
+        User user = findUserById(userId);
+        Item item = ItemMapper.toModel(itemDto, user);
         item.setId(itemId);
         List<Comment> comments = commentRepository.findByItemId(itemId);
         item = itemRepository.save(refreshItem(item));
@@ -82,7 +81,7 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId).orElseThrow();
         List<Comment> comments = commentRepository.findByItemId(itemId);
 
-        if (item.getOwner().equals(userId)) {
+        if (item.getOwner().getId().equals(userId)) {
             return getItemsWithBookingsAndComments(List.of(item), List.of(item.getId())).get(0);
         }
         return ItemMapper.toDto(item, null, null, comments == null ? List.of() : comments);
@@ -94,7 +93,7 @@ public class ItemServiceImpl implements ItemService {
         Page<Item> itemPage = itemRepository.findAll(userId, pageable);
         List<Item> userItems = itemPage.getContent();
 
-        List<Long> itemIds = itemRepository.findAllByOwner(userId)
+        List<Long> itemIds = itemRepository.findAllByOwnerId(userId)
                 .stream()
                 .map(Item::getId)
                 .collect(Collectors.toList());
@@ -151,8 +150,9 @@ public class ItemServiceImpl implements ItemService {
                 .collect(Collectors.toList());
     }
 
-    private boolean isOwnerExists(long ownerId) {
-        return userRepository.findById(ownerId).isPresent();
+    private User findUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new OwnerNotFoundException(String.format("Не найден владелец c id: %s", userId)));
     }
 
     private Item refreshItem(Item patch) {

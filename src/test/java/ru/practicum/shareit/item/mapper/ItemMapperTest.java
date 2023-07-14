@@ -8,6 +8,7 @@ import ru.practicum.shareit.item.Comment;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemInRequestDto;
+import ru.practicum.shareit.request.Request;
 import ru.practicum.shareit.user.User;
 
 import java.time.LocalDateTime;
@@ -27,13 +28,14 @@ public class ItemMapperTest {
 
     @BeforeEach
     public void beforeEach() {
-        item = new Item(
-                ID,
-                "name",
-                "description",
-                true,
-                ID,
-                ID + 1);
+        item = Item.builder()
+                .id(ID)
+                .name("name")
+                .description("description")
+                .available(true)
+                .request(Request.builder().id(ID + 1).build())
+                .owner(User.builder().id(ID).build())
+                .build();
 
         itemDto = new ItemDto(
                 ID,
@@ -73,12 +75,12 @@ public class ItemMapperTest {
 
     @Test
     public void toModel() {
-        Item result = ItemMapper.toModel(itemDto, ID);
+        Item result = ItemMapper.toModel(itemDto, User.builder().id(ID).build());
 
         assertNotNull(result);
         assertEquals(itemDto.getName(), result.getName());
         assertEquals(itemDto.getDescription(), result.getDescription());
-        assertEquals(ID, result.getOwner());
+        assertEquals(ID, result.getOwner().getId());
     }
 
     @Test
@@ -102,8 +104,8 @@ public class ItemMapperTest {
         assertEquals(item.getName(), result.get(0).getName());
         assertEquals(item.getDescription(), result.get(0).getDescription());
         assertEquals(item.getAvailable(), result.get(0).getAvailable());
-        assertEquals(item.getRequestId(), result.get(0).getRequestId());
-        assertEquals(item.getOwner(), result.get(0).getOwner());
+        assertEquals(item.getRequest().getId(), result.get(0).getRequestId());
+        assertEquals(item.getOwner().getId(), result.get(0).getOwner());
 
     }
 }

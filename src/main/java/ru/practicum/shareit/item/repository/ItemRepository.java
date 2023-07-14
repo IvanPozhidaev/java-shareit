@@ -14,9 +14,9 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             " or upper(i.description) like upper(concat('%', ?1, '%')) and i.available = true")
     Page<Item> search(String text, Pageable pageable);
 
-    List<Item> findAllByOwner(Long ownerId);
+    List<Item> findAllByOwnerId(Long ownerId);
 
-    @Query("select i from items i where i.owner = ?1")
+    @Query("select i from items i where i.owner.id = ?1")
     Page<Item> findAll(Long userId, Pageable pageable);
 
     List<Item> findAllByRequestId(Long requestId);

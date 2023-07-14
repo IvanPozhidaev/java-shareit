@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.booking.dto.*;
 import ru.practicum.shareit.item.Item;
+import ru.practicum.shareit.request.Request;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserDto;
 
@@ -37,8 +38,8 @@ public class BookingMapperTest {
                 "name",
                 "description",
                 true,
-                ID + 1,
-                ID + 1);
+                User.builder().id(ID + 1).build(),
+                Request.builder().id(ID + 1).build());
         booking = new Booking(ID,
                 DATE,
                 DATE.plusDays(7),

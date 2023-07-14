@@ -41,14 +41,14 @@ public class CommentRepositoryTest {
         LocalDateTime date = LocalDateTime.now();
         itemOwner = userRepository.save(new User(null, "itemOwner", "itemOwner@email.com"));
         requestor = userRepository.save(new User(null, "requestor", "requestor@email.com"));
-        request = requestRepository.save(new Request(null, "description", requestor.getId(), date));
+        request = requestRepository.save(new Request(null, "description", requestor, date));
 
         item = itemRepository.save(
                 new Item(null,
                         "item",
                         "description",
                         true,
-                        itemOwner.getId(),
+                        itemOwner,
                         null));
 
         comment = commentRepository.save(new Comment(null, "comment", item, itemOwner, LocalDateTime.now()));

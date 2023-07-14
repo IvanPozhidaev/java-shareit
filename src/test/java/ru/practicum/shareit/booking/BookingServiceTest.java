@@ -13,6 +13,7 @@ import ru.practicum.shareit.exception.UnavailableBookingException;
 import ru.practicum.shareit.exception.UnsupportedStatusException;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.Request;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -60,8 +61,8 @@ public class BookingServiceTest {
                 "name",
                 "description",
                 true,
-                ID + 1,
-                ID + 1);
+                User.builder().id(ID + 1).build(),
+                Request.builder().id(ID + 1).build());
         booking = new Booking(ID,
                 DATE,
                 DATE.plusDays(7),
@@ -121,7 +122,7 @@ public class BookingServiceTest {
 
     @Test
     public void createInvalidBookingTest() {
-        item.setOwner(user.getId());
+        item.setOwner(user);
         when(userRepository.findById(any(Long.class)))
                 .thenReturn(Optional.ofNullable(user));
 
@@ -158,7 +159,7 @@ public class BookingServiceTest {
     @Test
     public void patchBookingNoSuchElementExceptionTest() {
         booking.setStatus(BookingStatus.WAITING);
-        item.setOwner(ID);
+        item.setOwner(user);
         when(bookingRepository.findById(any(Long.class)))
                 .thenReturn(Optional.ofNullable(booking));
 
@@ -191,7 +192,7 @@ public class BookingServiceTest {
 
     @Test
     public void findByIdTest() {
-        item.setOwner(owner.getId());
+        item.setOwner(owner);
 
         when(userRepository.findById(any(Long.class)))
                 .thenReturn(Optional.ofNullable(user));
@@ -344,7 +345,7 @@ public class BookingServiceTest {
                 .thenReturn(Optional.ofNullable(user));
 
         when(bookingRepository
-                .findBookingByItemOwnerAndStatus(any(Long.class), any(BookingStatus.class), any(Pageable.class)))
+                .findBookingByItemOwnerIdAndStatus(any(Long.class), any(BookingStatus.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(Collections.singletonList(booking)));
 
         List<BookingDetailedDto> result = bookingService
@@ -361,7 +362,7 @@ public class BookingServiceTest {
                 .thenReturn(Optional.ofNullable(user));
 
         when(bookingRepository
-                .findBookingByItemOwnerAndStatus(any(Long.class), any(BookingStatus.class), any(Pageable.class)))
+                .findBookingByItemOwnerIdAndStatus(any(Long.class), any(BookingStatus.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(Collections.singletonList(booking)));
 
         List<BookingDetailedDto> result = bookingService
@@ -378,7 +379,7 @@ public class BookingServiceTest {
                 .thenReturn(Optional.ofNullable(user));
 
         when(bookingRepository
-                .findBookingsByItemOwnerCurrent(any(Long.class), any(LocalDateTime.class), any(Pageable.class)))
+                .findBookingsByItemOwnerIdCurrent(any(Long.class), any(LocalDateTime.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(Collections.singletonList(booking)));
 
         List<BookingDetailedDto> result = bookingService
@@ -395,7 +396,7 @@ public class BookingServiceTest {
                 .thenReturn(Optional.ofNullable(user));
 
         when(bookingRepository
-                .findBookingByItemOwnerAndStartIsAfter(any(Long.class), any(LocalDateTime.class), any(Pageable.class)))
+                .findBookingByItemOwnerIdAndStartIsAfter(any(Long.class), any(LocalDateTime.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(Collections.singletonList(booking)));
 
         List<BookingDetailedDto> result = bookingService
@@ -412,7 +413,7 @@ public class BookingServiceTest {
                 .thenReturn(Optional.ofNullable(user));
 
         when(bookingRepository
-                .findBookingByItemOwnerAndEndIsBefore(any(Long.class), any(LocalDateTime.class), any(Pageable.class)))
+                .findBookingByItemOwnerIdAndEndIsBefore(any(Long.class), any(LocalDateTime.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(Collections.singletonList(booking)));
 
         List<BookingDetailedDto> result = bookingService
@@ -429,7 +430,7 @@ public class BookingServiceTest {
                 .thenReturn(Optional.ofNullable(user));
 
         when(bookingRepository
-                .findBookingByItemOwner(any(Long.class), any(Pageable.class)))
+                .findBookingByItemOwnerId(any(Long.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(Collections.singletonList(booking)));
 
         List<BookingDetailedDto> result = bookingService

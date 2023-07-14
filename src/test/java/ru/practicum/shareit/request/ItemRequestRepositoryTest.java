@@ -33,13 +33,13 @@ public class ItemRequestRepositoryTest {
         LocalDateTime dateTime = LocalDateTime.now();
         user = userRepository.save(new User(null, "user", "user@email.com"));
         requestor = userRepository.save(new User(null, "requestor", "requestor@email.com"));
-        request = itemRequestRepository.save(new Request(null, "request", requestor.getId(), dateTime));
+        request = itemRequestRepository.save(new Request(null, "request", requestor, dateTime));
     }
 
     @Test
     public void findRequestByRequestorOrderByCreatedDescTest() {
         List<Request> result = itemRequestRepository
-                .findRequestByRequestorOrderByCreatedDesc(requestor.getId());
+                .findRequestByRequestorIdOrderByCreatedDesc(requestor.getId());
 
         assertNotNull(result);
         assertFalse(result.isEmpty());

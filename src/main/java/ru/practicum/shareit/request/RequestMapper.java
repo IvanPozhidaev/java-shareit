@@ -10,6 +10,7 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.dto.PostRequestDto;
 import ru.practicum.shareit.request.dto.PostResponseRequestDto;
 import ru.practicum.shareit.request.dto.RequestWithItemsDto;
+import ru.practicum.shareit.user.User;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,10 +20,10 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RequestMapper {
 
-    public static Request toModel(PostRequestDto dto, Long requestor) {
+    public static Request toModel(PostRequestDto dto, Long requestorId) {
         Request request = new Request();
         request.setDescription(dto.getDescription());
-        request.setRequestor(requestor);
+        request.setRequestor(User.builder().id(requestorId).build());
         request.setCreated(LocalDateTime.now());
         return request;
     }

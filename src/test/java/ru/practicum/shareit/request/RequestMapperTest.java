@@ -8,6 +8,7 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.dto.PostRequestDto;
 import ru.practicum.shareit.request.dto.PostResponseRequestDto;
 import ru.practicum.shareit.request.dto.RequestWithItemsDto;
+import ru.practicum.shareit.user.User;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,7 +30,12 @@ public class RequestMapperTest {
     @BeforeEach
     public void beforeEach() {
         itemRepository = mock(ItemRepository.class);
-        request = new Request(ID, "description", ID, CREATED_DATE);
+        request = Request.builder()
+                .id(ID)
+                .description("description")
+                .created(CREATED_DATE)
+                .requestor(User.builder().id(ID).build())
+                .build();
         postRequestDto = new PostRequestDto("description");
     }
 
@@ -38,7 +44,7 @@ public class RequestMapperTest {
         Request result = RequestMapper.toModel(postRequestDto, ID);
 
         assertNotNull(result);
-        assertEquals(ID, result.getRequestor());
+        assertEquals(ID, result.getRequestor().getId());
         assertEquals(postRequestDto.getDescription(), result.getDescription());
     }
 
