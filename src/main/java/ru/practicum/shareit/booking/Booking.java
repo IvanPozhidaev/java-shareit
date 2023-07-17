@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 public class Booking {
 
     @Id
-    @Column(name = "booking_id")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -28,12 +28,12 @@ public class Booking {
     @Column(name = "end_time", nullable = false)
     private LocalDateTime end;
 
-    @ManyToOne
-    @JoinColumn(name = "item_id")
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "item_id", referencedColumnName = "id")
     private Item item;
 
     @ManyToOne
-    @JoinColumn(name = "booker_id")
+    @JoinColumn(name = "booker_id", referencedColumnName = "id")
     private User booker;
 
     @Column(name = "status", nullable = false)

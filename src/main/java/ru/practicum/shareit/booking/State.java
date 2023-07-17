@@ -15,7 +15,7 @@ public enum State {
    public static State parseState(String state) {
         State status;
         try {
-            status = State.valueOf(state);
+            status = State.valueOf(state.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new UnsupportedStatusException(ILLEGAL_STATE_MESSAGE + state);
         }

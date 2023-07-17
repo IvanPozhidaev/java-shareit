@@ -1,17 +1,23 @@
 package ru.practicum.shareit.item.mapper;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.dto.BookingInItemDto;
 import ru.practicum.shareit.item.Comment;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemInRequestDto;
+import ru.practicum.shareit.request.Request;
+import ru.practicum.shareit.user.User;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemMapper {
     public static ItemDto toDto(Item item, List<Comment> comments) {
         ItemDto dto = new ItemDto();
@@ -22,6 +28,7 @@ public class ItemMapper {
         if (comments != null) {
             dto.setComments(CommentMapper.toCommentDetailedDtoList(comments));
         }
+        dto.setRequestId(item.getRequest() == null ? null : item.getRequest().getId());
         return dto;
     }
 
@@ -78,7 +85,30 @@ public class ItemMapper {
         return dto;
     }
 
-    public static Item toModel(ItemDto itemDto, Long ownerId) {
-        return new Item(null, itemDto.getName(), itemDto.getDescription(), itemDto.getAvailable(), ownerId);
+    public static Item toModel(ItemDto itemDto, User user) {
+        Item item = new Item();
+        item.setName(itemDto.getName());
+        item.setDescription(itemDto.getDescription());
+        item.setAvailable(itemDto.getAvailable());
+        item.setOwner(user);
+        item.setRequest(itemDto.getRequestId() == null ? null : Request.builder().id(itemDto.getRequestId()).build());
+        return item;
+    }
+
+    public static ItemInRequestDto toRequestItemDto(Item item) {
+        ItemInRequestDto dto = new ItemInRequestDto();
+        dto.setId(item.getId());
+        dto.setName(item.getName());
+        dto.setDescription(item.getDescription());
+        dto.setAvailable(item.getAvailable());
+        dto.setRequestId(item.getRequest().getId());
+        dto.setOwner(item.getOwner().getId());
+        return dto;
+    }
+
+    public static List<ItemInRequestDto> toRequestItemDtoList(List<Item> items) {
+        return items.stream()
+                .map(ItemMapper::toRequestItemDto)
+                .collect(Collectors.toList());
     }
 }
