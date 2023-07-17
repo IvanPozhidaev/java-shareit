@@ -63,7 +63,7 @@ public class ItemRepositoryTest {
 
     @Test
     public void findAllTest() {
-        Page<Item> result = itemRepository.findAll(itemOwner.getId(), Pageable.unpaged());
+        Page<Item> result = itemRepository.findByOwnerId(itemOwner.getId(), Pageable.unpaged());
 
         assertNotNull(result);
         assertFalse(result.isEmpty());

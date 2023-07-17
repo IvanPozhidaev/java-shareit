@@ -226,7 +226,7 @@ public class ItemServiceTest {
 
     @Test
     public void findAllItemsTest() {
-        when(itemRepository.findAll(any(Long.class), any(Pageable.class)))
+        when(itemRepository.findByOwnerId(any(Long.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(new ArrayList<>()));
 
         List<ItemDto> result = itemService.findAllItems(ID, FROM_VALUE, SIZE_VALUE);

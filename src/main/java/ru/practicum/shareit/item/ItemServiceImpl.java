@@ -90,7 +90,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> findAllItems(Long userId, int from, int size) {
         Pageable pageable = PageRequest.of(from / size, size);
-        Page<Item> itemPage = itemRepository.findAll(userId, pageable);
+        Page<Item> itemPage = itemRepository.findByOwnerId(userId, pageable);
         List<Item> userItems = itemPage.getContent();
 
         List<Long> itemIds = itemRepository.findAllByOwnerId(userId)
@@ -119,7 +119,6 @@ public class ItemServiceImpl implements ItemService {
                 .stream()
                 .collect(Collectors.groupingBy(b -> b.getItem().getId()));
         List<Booking> all = bookingRepository.findAll();
-        System.out.println(LocalDateTime.now());
         Map<Long, List<Booking>> lastByItemIds = bookingRepository.findLastByItemIds(itemIds,
                         LocalDateTime.now(),
                         BookingStatus.APPROVED.name())
