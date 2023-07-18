@@ -15,6 +15,7 @@ import java.util.Map;
 @Service
 public class BookingClient extends BaseClient {
     private static final String API_PREFIX = "/bookings";
+    public static final String BOOKING_INVALID_MESSAGE = "недопустимые значения времени бронирования: ";
 
     @Autowired
     public BookingClient(@Value("${shareit-server.url}") String serverUrl, RestTemplateBuilder builder) {
@@ -26,25 +27,26 @@ public class BookingClient extends BaseClient {
         );
     }
 
-    //BookingPostResponseDto
     public ResponseEntity<Object> createBooking(BookingPostDto dto, Long userId) {
+        if (!isStartBeforeEnd(dto)) {
+            throw new IllegalArgumentException(BOOKING_INVALID_MESSAGE +
+                    "start: " + dto.getStart() + " end: " + dto.getEnd() + " now: ");
+        }
         return post("", userId, dto);
     }
 
-    //BookingResponseDto
     public ResponseEntity<Object> patchBooking(Long bookingId, Boolean approved, Long userId) {
         Map<String, Object> parameters = Map.of(
                 "approved", approved
         );
-        return patch("/" + bookingId, userId, parameters);
+        return patch("/" + bookingId + "?approved={approved}", userId, parameters);
     }
 
-    //BookingDetailedDto
     public ResponseEntity<Object> findById(Long bookingId, Long userId) {
         return get("/" + bookingId, userId);
     }
-    //List<BookingDetailedDto>
-    public ResponseEntity<Object> findAllByBooker(String state, Long userId, Integer from, Integer size) {
+
+    public ResponseEntity<Object> findAllByBooker(String state, Long userId, int from, int size) {
         Map<String, Object> parameters = Map.of(
                 "state", state,
                 "from", from,
@@ -53,7 +55,6 @@ public class BookingClient extends BaseClient {
         return get("?state={state}&from={from}&size={size}", userId, parameters);
     }
 
-    //List<BookingDetailedDto>
     public ResponseEntity<Object> findAllByItemOwner(String state, Long userId, int from, int size) {
         Map<String, Object> parameters = Map.of(
                 "state", state,
@@ -61,5 +62,9 @@ public class BookingClient extends BaseClient {
                 "size", size
         );
         return get("/owner?state={state}&from={from}&size={size}", userId, parameters);
+    }
+
+    private boolean isStartBeforeEnd(BookingPostDto dto) {
+        return dto.getStart().isBefore(dto.getEnd());
     }
 }
