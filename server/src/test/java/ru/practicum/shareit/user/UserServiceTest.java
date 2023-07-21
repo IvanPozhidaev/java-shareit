@@ -2,7 +2,6 @@ package ru.practicum.shareit.user;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.Collections;
 import java.util.List;

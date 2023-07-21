@@ -14,8 +14,6 @@ import javax.validation.constraints.Min;
 @RequestMapping(path = "/requests")
 @AllArgsConstructor
 public class ItemRequestController {
-
-    public static final int MIN_VALUE = 0;
     public static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     private final RequestClient requestClient;
@@ -34,9 +32,9 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public ResponseEntity<Object> findAll(@RequestParam(defaultValue = "0")
-                                          @Min(MIN_VALUE) int from,
+                                          @Min(0) int from,
                                           @RequestParam(defaultValue = "20")
-                                          @Min(MIN_VALUE) int size,
+                                          @Min(1) int size,
                                           @RequestHeader(USER_ID_HEADER) Long userId) {
         return requestClient.findAll(from, size, userId);
     }

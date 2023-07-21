@@ -1,8 +1,6 @@
 package ru.practicum.shareit.booking.dto;
 
-import ru.practicum.shareit.exception.UnsupportedStatusException;
-
-import static ru.practicum.shareit.booking.BookingServiceImpl.ILLEGAL_STATE_MESSAGE;
+import ru.practicum.shareit.errorhandler.UnsupportedStatusException;
 
 public enum State {
     ALL,
@@ -17,7 +15,7 @@ public enum State {
         try {
             status = State.valueOf(state.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new UnsupportedStatusException(ILLEGAL_STATE_MESSAGE + state);
+            throw new UnsupportedStatusException("  state: " + state);
         }
         return status;
     }

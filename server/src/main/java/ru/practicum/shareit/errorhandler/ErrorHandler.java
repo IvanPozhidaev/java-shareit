@@ -80,6 +80,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handle(Throwable e) {
+        e.printStackTrace();
         log.warn("Непредвиденная ошибка сервера", e);
         return new ErrorResponse("непредвиденная ошибка сервера 500: ", e.getMessage());
     }

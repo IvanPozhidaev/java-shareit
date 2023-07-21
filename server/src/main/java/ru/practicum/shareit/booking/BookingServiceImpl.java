@@ -105,7 +105,7 @@ public class BookingServiceImpl implements BookingService {
         LocalDateTime start = LocalDateTime.now();
         LocalDateTime end = LocalDateTime.now();
 
-        Pageable pageable = PageRequest.of(from / size, size, Sort.by("start").descending());
+        Pageable pageable = PageRequest.of(from / size, size, Sort.by("start", "end").descending());
 
         switch (status) {
             case REJECTED:
@@ -142,7 +142,7 @@ public class BookingServiceImpl implements BookingService {
         checkIfUserExists(userId);
         LocalDateTime now = LocalDateTime.now();
 
-        Pageable pageable = PageRequest.of(from / size, size, Sort.by("start").descending());
+        Pageable pageable = PageRequest.of(from / size, size, Sort.by("start", "end").descending());
 
         switch (state) {
             case REJECTED:

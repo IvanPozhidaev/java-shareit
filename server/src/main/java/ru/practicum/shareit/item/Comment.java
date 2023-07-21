@@ -7,7 +7,6 @@ import lombok.Setter;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Getter
@@ -33,6 +32,5 @@ public class Comment {
     @JoinColumn(name = "author_id")
     private User author;
 
-    @NotNull
     private LocalDateTime created;
 }

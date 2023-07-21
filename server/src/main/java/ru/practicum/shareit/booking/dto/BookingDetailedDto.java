@@ -5,9 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.UserDto;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 
@@ -17,10 +16,8 @@ import java.time.LocalDateTime;
 public class BookingDetailedDto {
     private Long id;
 
-    @NotNull
     private LocalDateTime start;
 
-    @NotNull
     private LocalDateTime end;
 
     private BookingStatus status;
