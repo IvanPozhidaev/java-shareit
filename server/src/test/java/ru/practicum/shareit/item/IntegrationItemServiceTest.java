@@ -43,8 +43,8 @@ public class IntegrationItemServiceTest {
 
     @AfterEach
     public void afterEach() {
-        userService.deleteUserById(userDto.getId());
         itemRepository.deleteById(itemDto.getId());
+        userService.deleteUserById(userDto.getId());
     }
 
     @Test
