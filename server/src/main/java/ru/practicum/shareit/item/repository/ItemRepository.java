@@ -16,8 +16,6 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
 
     List<Item> findAllByOwnerId(Long ownerId);
 
-//    @Query("select i from items i where i.owner.id = ?1")
-//    Page<Item> findAll(Long userId, Pageable pageable);
     Page<Item> findByOwnerId(Long userId, Pageable pageable);
 
     List<Item> findAllByRequestId(Long requestId);

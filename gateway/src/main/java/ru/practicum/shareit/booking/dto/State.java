@@ -10,7 +10,7 @@ public enum State {
     WAITING,
     REJECTED;
 
-   public static State parseState(String state) {
+    public static State parseState(String state) {
         State status;
         try {
             status = State.valueOf(state.toUpperCase());
