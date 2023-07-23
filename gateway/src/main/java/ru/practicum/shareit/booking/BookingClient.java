@@ -28,7 +28,7 @@ public class BookingClient extends BaseClient {
     }
 
     public ResponseEntity<Object> createBooking(BookingPostDto dto, Long userId) {
-        if (!isStartBeforeEnd(dto)) {
+        if (!dto.getStart().isBefore(dto.getEnd())) {
             throw new IllegalArgumentException(BOOKING_INVALID_MESSAGE +
                     "start: " + dto.getStart() + " end: " + dto.getEnd() + " now: ");
         }
@@ -62,9 +62,5 @@ public class BookingClient extends BaseClient {
                 "size", size
         );
         return get("/owner?state={state}&from={from}&size={size}", userId, parameters);
-    }
-
-    private boolean isStartBeforeEnd(BookingPostDto dto) {
-        return dto.getStart().isBefore(dto.getEnd());
     }
 }
